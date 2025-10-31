@@ -1,0 +1,37 @@
+@import "../../variables.css";
+
+.radio-group {
+  display: flex;
+  border-radius: 0.5rem;
+}
+.radio-plus-label {
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+  color: var(--white);
+  background-color: #233089;
+  transition: 0.3s ease;
+  cursor: pointer;
+}
+
+#label-student {
+  border-radius: 0.5rem 0 0 0.5rem;
+}
+
+#label-professor {
+  border-radius: 0 0.5rem 0.5rem 0;
+}
+
+#label-student:hover:not(.active) {
+  color: var(--dark-indigo);
+}
+
+#label-professor:hover:not(.active) {
+  color: var(--dark-indigo);
+}
+
+.form-radio {
+  display: none;
+}
+.radio-plus-label.active {
+  background-color: var(--dark-indigo);
+}
