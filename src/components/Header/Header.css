@@ -1,0 +1,30 @@
+.header {
+  background-color: var(--color-primary);
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 24px;
+  font-weight: 500;
+  font-size: 1rem;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.welcome {
+  display: flex;
+  align-items: center;
+}
+
+.logout-btn {
+  background-color: white;
+  color: var(--color-primary);
+  border: none;
+  border-radius: 6px;
+  padding: 6px 12px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.logout-btn:hover {
+  background-color: #e5e7eb;
+}

@@ -18,9 +18,18 @@ export default function Login() {
         email,
         password,
       });
-      localStorage.setItem("token", res.data.token);
-      alert("Autentificare reușită!");
-      navigate("/"); // poți schimba destinația după login
+
+      const data = res.data;
+
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("role", data.user.role);
+      localStorage.setItem("name", data.user.name);
+
+      if (data.user.role === "profesor") {
+        navigate("/dashboard");
+      } else {
+        navigate("/student");
+      }
     } catch (err) {
       setError(err.response?.data?.message || "Eroare la autentificare");
     }

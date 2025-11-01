@@ -1,6 +1,8 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Login from "./pages/Login/Login";
 import Register from "./pages/Register/Register";
+import TeacherDashboard from "./pages/TeacherDashboard/TeacherDashboard";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
   return (
@@ -9,6 +11,15 @@ function App() {
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute allowedRole="profesor">
+                <TeacherDashboard />
+              </ProtectedRoute>
+            }
+          />
+          {/* la fel pentru student */}
         </Routes>
       </div>
     </Router>
