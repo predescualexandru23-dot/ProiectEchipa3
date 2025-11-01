@@ -3,7 +3,8 @@ Extensii:
 SQLite, SQLite viewer, ES7 React, GitGraph;
 
 Cum rulam aplicatia: 
-
+ 
+ Ne dorim sa fie si Viorel prezent
 Dupa instalarea de node modules (cu 'npm i') in folderele backend respectiv src, folosim npm run dev pentru a porni front-endul si npm run dev rulat in folderul backend pentru a porni backendul.
 
 Cerinte:
