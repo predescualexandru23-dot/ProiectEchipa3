@@ -11,7 +11,7 @@ app.use(cors());
 app.use(express.json());
 
 app.use("/api/auth", authRoutes);
-app
+app.use("/api/activities", activityRoutes);
 
 
 app.get("/", (req, res) => {

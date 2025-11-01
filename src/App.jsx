@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Login from "./pages/Login/Login";
 import Register from "./pages/Register/Register";
+import Activity from "./pages/Activity/Activity";
 import TeacherDashboard from "./pages/TeacherDashboard/TeacherDashboard";
 import ProtectedRoute from "./components/ProtectedRoute";
 
@@ -16,6 +17,14 @@ function App() {
             element={
               <ProtectedRoute allowedRole="profesor">
                 <TeacherDashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/student"
+            element={
+              <ProtectedRoute role="student">
+                <Activity />
               </ProtectedRoute>
             }
           />

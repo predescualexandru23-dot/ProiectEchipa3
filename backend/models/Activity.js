@@ -18,7 +18,7 @@ export const Activity = sequelize.define("Activity", {
     accessCode: {
         type: DataTypes.STRING,
         allowNull: false,
-        unique: true,
+        // Am eliminat `unique: true` pentru a permite reutilizarea codului
     },
     date: {
         type: DataTypes.DATE,
