@@ -132,7 +132,7 @@ export default function ActivityPage() {
     <>
     <Header />
     <div className="activity-container">
-      <h2 className="activity">Activitate: {activity.accessCode}</h2>
+      <h2 className="activity">Cod Activitate: {activity.accessCode}</h2>
       <p className="time-remaining">
         🕒 Time remaining: {formatTime(timeLeft)}
       </p>
@@ -179,8 +179,8 @@ export default function ActivityPage() {
       <button className="back-button"
         onClick={goBack}
       >
+        <span className="return-emoji">⬅</span>
         <span className="return-text">Return to activity code</span>
-        <span className="return-emoji">⬅️</span>
       </button>
     </div>
     </>
