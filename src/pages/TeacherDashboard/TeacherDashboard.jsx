@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import Header from "../../components/Header/Header";
-import "./TeacherDashboard.css";
+import "./TeacherDashboard";
 
 export default function TeacherDashboard() {
   const [description, setDescription] = useState("");
