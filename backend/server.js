@@ -13,11 +13,9 @@ app.use(express.json());
 app.use("/api/auth", authRoutes);
 app.use("/api/activities", activityRoutes);
 
-
 app.get("/", (req, res) => {
     res.send("Backendul functioneaza");
 });
-
 
 sequelize.sync().then(() => {
     app.listen(process.env.PORT || 5000, () =>

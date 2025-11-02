@@ -1,5 +1,6 @@
 import { Activity } from "../models/Activity.js";
 
+// 🔹 Creează activitate (profesor)
 export const createActivity = async (req, res) => {
     try {
         const { description, duration, accessCode } = req.body;
@@ -10,16 +11,15 @@ export const createActivity = async (req, res) => {
 
         const now = new Date();
 
-        // Caută toate activitățile cu același cod
+        // Caută activități cu același cod pentru profesorul curent
         const existingActivities = await Activity.findAll({
-            where: { accessCode },
+            where: { accessCode, UserId: req.user.id },
             order: [["date", "DESC"]],
         });
 
         // Verifică dacă vreuna este încă activă
         const activeActivity = existingActivities.find((act) => {
-            const activityDate = new Date(act.date); // convertim în Date
-            const endTime = new Date(activityDate.getTime() + act.duration * 60000);
+            const endTime = new Date(act.date.getTime() + act.duration * 60000);
             return endTime > now; // încă activă
         });
 
@@ -29,11 +29,12 @@ export const createActivity = async (req, res) => {
             });
         }
 
-        // Creează activitatea dacă nu există activitate activă
+        // Creează activitatea
         const activity = await Activity.create({
             description,
             duration,
             accessCode,
+            UserId: req.user.id, // asociem activitatea cu profesorul logat
         });
 
         res.status(201).json({ message: "Activitate creată cu succes", activity });
@@ -43,12 +44,13 @@ export const createActivity = async (req, res) => {
     }
 };
 
-// Obține activitatea curentă (cea care nu s-a terminat încă)
+// 🔹 Obține activitatea curentă (profesor)
 export const getActiveActivityWithFeedback = async (req, res) => {
     try {
         const now = new Date();
 
         const activity = await Activity.findOne({
+            where: { UserId: req.user.id },
             order: [["date", "DESC"]],
             include: ["feedbacks"],
         });
@@ -65,12 +67,13 @@ export const getActiveActivityWithFeedback = async (req, res) => {
     }
 };
 
-// Obține activitățile trecute
+// 🔹 Obține activitățile trecute (profesor)
 export const getPastActivities = async (req, res) => {
     try {
         const now = new Date();
 
         const activities = await Activity.findAll({
+            where: { UserId: req.user.id },
             order: [["date", "DESC"]],
             include: ["feedbacks"],
         });
@@ -87,8 +90,7 @@ export const getPastActivities = async (req, res) => {
     }
 };
 
-
-// Endpoint pentru student – joinActivity
+// 🔹 Endpoint pentru student – joinActivity
 export const joinActivity = async (req, res) => {
     try {
         const { accessCode } = req.body;
@@ -121,4 +123,3 @@ export const joinActivity = async (req, res) => {
         res.status(500).json({ message: "Eroare la accesarea activității" });
     }
 };
-

@@ -10,8 +10,9 @@ export default function TeacherDashboard() {
   const [currentActivity, setCurrentActivity] = useState(null);
   const [feedbacks, setFeedbacks] = useState([]);
   const [pastActivities, setPastActivities] = useState([]);
-  const [timeLeft, setTimeLeft] = useState(null);
-  const [justExpired, setJustExpired] = useState(false);
+
+  // Ia token-ul din localStorage
+  const token = localStorage.getItem("token");
 
   // 🔹 Creare activitate
   const handleSubmit = async (e) => {
@@ -20,7 +21,10 @@ export default function TeacherDashboard() {
     try {
       const res = await fetch("http://localhost:5000/api/activities", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
         body: JSON.stringify({ description, duration, accessCode }),
       });
 
@@ -30,8 +34,8 @@ export default function TeacherDashboard() {
         setDescription("");
         setDuration("");
         setAccessCode("");
-        fetchCurrentActivity();
-        fetchPastActivities();
+        fetchCurrentActivity(); // reîncarcă activitatea curentă
+        fetchPastActivities(); // actualizează istoricul
       } else {
         setMessage(data.message || "❌ Eroare la creare");
       }
@@ -41,10 +45,12 @@ export default function TeacherDashboard() {
     }
   };
 
-  // 🔹 Obține activitatea curentă
+  // 🔹 Obține activitatea curentă (profesor)
   const fetchCurrentActivity = async () => {
     try {
-      const res = await fetch("http://localhost:5000/api/activities/current");
+      const res = await fetch("http://localhost:5000/api/activities/current", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       if (!res.ok) {
         setCurrentActivity(null);
         setFeedbacks([]);
@@ -53,24 +59,17 @@ export default function TeacherDashboard() {
       const data = await res.json();
       setCurrentActivity(data);
       setFeedbacks(data.feedbacks || []);
-
-      // calculează timpul rămas
-      if (data.date && data.duration) {
-        const now = new Date();
-        const startTime = new Date(data.date);
-        const endTime = new Date(startTime.getTime() + data.duration * 60000);
-        const remaining = Math.max(0, Math.floor((endTime - now) / 1000));
-        setTimeLeft(remaining);
-      }
     } catch (err) {
       console.error("Eroare la preluarea activității curente:", err);
     }
   };
 
-  // 🔹 Obține activitățile trecute
+  // 🔹 Obține activitățile trecute (profesor)
   const fetchPastActivities = async () => {
     try {
-      const res = await fetch("http://localhost:5000/api/activities/past");
+      const res = await fetch("http://localhost:5000/api/activities/past", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       const data = await res.json();
       setPastActivities(data);
     } catch (err) {
@@ -78,77 +77,14 @@ export default function TeacherDashboard() {
     }
   };
 
-  // 🔹 Polling pentru activitate curentă (cu protecție după expirare)
+  // 🔹 Polling pentru feedback în timp real
   useEffect(() => {
-    if (!justExpired) {
-      fetchCurrentActivity();
-    }
+    fetchCurrentActivity();
     fetchPastActivities();
 
-    const interval = setInterval(() => {
-      if (!justExpired) {
-        fetchCurrentActivity();
-      }
-    }, 2000);
-
+    const interval = setInterval(fetchCurrentActivity, 2000);
     return () => clearInterval(interval);
-  }, [justExpired]);
-
-  // 🔹 Timer pentru activitatea curentă
-  useEffect(() => {
-    if (!currentActivity || timeLeft === null) return;
-
-    const timer = setInterval(() => {
-      setTimeLeft((prev) => {
-        if (prev <= 1) {
-          const expiredActivity = {
-            ...currentActivity,
-            feedbacks: feedbacks || [],
-          };
-
-          // adaugă imediat în lista de activități trecute
-          setPastActivities((prev) => {
-            if (
-              expiredActivity.id &&
-              prev.some((p) => p.id === expiredActivity.id)
-            ) {
-              return prev;
-            }
-            return [expiredActivity, ...prev];
-          });
-
-          setCurrentActivity(null);
-          setFeedbacks([]);
-          setTimeLeft(0);
-          setJustExpired(true);
-
-          fetchPastActivities();
-          setTimeout(() => setJustExpired(false), 3000);
-
-          clearInterval(timer);
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-
-    return () => clearInterval(timer);
-  }, [currentActivity, timeLeft, feedbacks]);
-
-  // 🔹 Formatare timp (mm:ss)
-  const formatTime = (seconds) => {
-    const m = Math.floor(seconds / 60);
-    const s = seconds % 60;
-    return `${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
-  };
-
-  // 🔹 Map emoji la simbol
-  const emojiMap = {
-    happy: "😊",
-    sad: "😞",
-    surprised: "😲",
-    confused: "😕",
-  };
+  }, []);
 
   return (
     <>
@@ -201,37 +137,38 @@ export default function TeacherDashboard() {
           )}
         </div>
 
-        {/* 🔹 Activitate curentă */}
+        {/* ACTIVITATE CURENTĂ */}
         {currentActivity && (
-          <div className="bg-white shadow-md rounded-xl p-6 w-full max-w-3xl">
+          <div className="bg-white shadow-md rounded-xl p-6 w-full max-w-3xl mt-6">
             <h2 className="text-2xl font-bold text-indigo-700 mb-4 text-center">
               Activitate curentă: {currentActivity.description}
             </h2>
-            <p className="text-center text-gray-600 mb-2">
+            <p className="text-center text-gray-600 mb-4">
               Cod: <strong>{currentActivity.accessCode}</strong> • Durată:{" "}
               {currentActivity.duration} minute
             </p>
-            <p className="text-center text-gray-700 mb-4">
-              🕒 Timp rămas: {formatTime(timeLeft || 0)}
-            </p>
 
-            <h3 className="text-lg font-semibold mb-2 text-center">
-              Feedback primit:
-            </h3>
+            <h3 className="text-lg font-semibold mb-2">Feedback primit:</h3>
             {feedbacks.length === 0 ? (
               <p className="text-gray-500 text-center">Niciun feedback încă</p>
             ) : (
-              <ul className="divide-y divide-gray-200">
+              <ul className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center">
                 {feedbacks.map((f, i) => (
                   <li
                     key={i}
-                    className="py-2 flex items-center justify-between"
+                    className="bg-gray-100 p-2 rounded-lg shadow-sm text-base"
                   >
-                    <span className="text-2xl">
-                      {emojiMap[f.emoji] || "❓"}
+                    <span className="mr-1">
+                      {f.emoji === "happy"
+                        ? "😊"
+                        : f.emoji === "sad"
+                        ? "😞"
+                        : f.emoji === "surprised"
+                        ? "😲"
+                        : "😕"}
                     </span>
-                    <span className="text-gray-700 capitalize">{f.emoji}</span>
-                    <span className="text-gray-500 text-sm">
+                    <span className="font-semibold">{f.emoji}</span>{" "}
+                    <span className="text-xs text-gray-500">
                       {new Date(f.timestamp).toLocaleTimeString()}
                     </span>
                   </li>
@@ -241,8 +178,8 @@ export default function TeacherDashboard() {
           </div>
         )}
 
-        {/* 🔹 Activități trecute */}
-        <div className="bg-white shadow-lg rounded-2xl p-8 w-full max-w-5xl">
+        {/* ACTIVITĂȚI TRECUTE */}
+        <div className="bg-white shadow-lg rounded-2xl p-8 w-full max-w-5xl mt-6">
           <h2 className="text-2xl font-semibold text-gray-700 mb-6">
             Activități trecute
           </h2>
@@ -272,11 +209,17 @@ export default function TeacherDashboard() {
                     <p className="text-sm mt-2 text-gray-700">
                       Total feedback-uri: {totalFeedbacks}
                     </p>
-
-                    <div className="flex gap-2 mt-2 text-lg flex-wrap">
+                    <div className="flex gap-2 mt-2 text-lg">
                       {Object.entries(counts).map(([emoji, num]) => (
                         <span key={emoji}>
-                          {emojiMap[emoji] || emoji} × {num}
+                          {emoji === "happy"
+                            ? "😊"
+                            : emoji === "sad"
+                            ? "😞"
+                            : emoji === "surprised"
+                            ? "😲"
+                            : "😕"}{" "}
+                          × {num}
                         </span>
                       ))}
                     </div>

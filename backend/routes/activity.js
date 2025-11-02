@@ -1,18 +1,24 @@
 import express from "express";
-import { createActivity, getActiveActivityWithFeedback, getPastActivities } from "../controllers/activityController.js";
+import {
+    createActivity,
+    getActiveActivityWithFeedback,
+    getPastActivities,
+    joinActivity,
+} from "../controllers/activityController.js";
 import { addFeedback, getFeedback, getActivityWithFeedback } from "../controllers/feedbackController.js";
-import { joinActivity } from "../controllers/activityController.js";
-
+import { verifyToken } from "../middleware/auth.js";
 
 const router = express.Router();
 
-router.post("/", createActivity);
-router.post("/feedback", addFeedback);
+// 🔹 Rute profesor – necesită token
+router.post("/", verifyToken, createActivity);
+router.get("/current", verifyToken, getActiveActivityWithFeedback);
+router.get("/past", verifyToken, getPastActivities);
+
+// 🔹 Rute student
 router.post("/join", joinActivity);
 router.get("/full/:accessCode", getActivityWithFeedback);
 router.get("/feedback/:accessCode", getFeedback);
-router.get("/current", getActiveActivityWithFeedback);
-router.get("/past", getPastActivities);
-
+router.post("/feedback", addFeedback);
 
 export default router;
