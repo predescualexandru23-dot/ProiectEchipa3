@@ -43,6 +43,51 @@ export const createActivity = async (req, res) => {
     }
 };
 
+// Obține activitatea curentă (cea care nu s-a terminat încă)
+export const getActiveActivityWithFeedback = async (req, res) => {
+    try {
+        const now = new Date();
+
+        const activity = await Activity.findOne({
+            order: [["date", "DESC"]],
+            include: ["feedbacks"],
+        });
+
+        if (!activity) return res.status(404).json({ message: "Nicio activitate" });
+
+        const endTime = new Date(activity.date.getTime() + activity.duration * 60000);
+        if (endTime < now) return res.status(404).json({ message: "Nicio activitate activă" });
+
+        res.json(activity);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Eroare la obținerea activității curente" });
+    }
+};
+
+// Obține activitățile trecute
+export const getPastActivities = async (req, res) => {
+    try {
+        const now = new Date();
+
+        const activities = await Activity.findAll({
+            order: [["date", "DESC"]],
+            include: ["feedbacks"],
+        });
+
+        const pastActivities = activities.filter((a) => {
+            const end = new Date(a.date.getTime() + a.duration * 60000);
+            return end < now;
+        });
+
+        res.json(pastActivities);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Eroare la obținerea activităților trecute" });
+    }
+};
+
+
 // Endpoint pentru student – joinActivity
 export const joinActivity = async (req, res) => {
     try {
@@ -76,3 +121,4 @@ export const joinActivity = async (req, res) => {
         res.status(500).json({ message: "Eroare la accesarea activității" });
     }
 };
+
