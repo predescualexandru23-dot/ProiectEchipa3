@@ -12,6 +12,13 @@ dist
 dist-ssr
 *.local
 
+# Ignore SQLite databases
+*.sqlite
+*.sqlite3
+database.sqlite
+db.sqlite
+
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
@@ -22,3 +29,5 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+
