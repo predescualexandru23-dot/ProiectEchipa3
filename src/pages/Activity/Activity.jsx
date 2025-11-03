@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
+import Header from "../../components/Header/Header"
+import "./Activity.css"
 
 export default function ActivityPage() {
   const [accessCodeInput, setAccessCodeInput] = useState("");
@@ -127,89 +129,60 @@ export default function ActivityPage() {
 
   // Pagina activității
   return (
-    <div style={{ padding: "2rem", textAlign: "center" }}>
-      <h2>Activitate: {activity.accessCode}</h2>
-      <p style={{ fontSize: "1.2rem" }}>
-        🕒 Timp rămas: {formatTime(timeLeft)}
+    <>
+    <Header />
+    <div className="activity-container">
+      <h2 className="activity">Cod Activitate: {activity.accessCode}</h2>
+      <p className="time-remaining">
+        🕒 Time remaining: {formatTime(timeLeft)}
       </p>
 
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(2, 100px)",
-          gap: "10px",
-          justifyContent: "center",
-          margin: "2rem 0",
-        }}
-      >
-        <button
-          onClick={() => sendFeedback("happy")}
+      <div className="feedback-grid">
+        <button className="feedback-button"
+          onClick={() => sendFeedback("Happy")}
           disabled={timeLeft === 0}
-          style={{
-            fontSize: "2rem",
-            cursor: timeLeft === 0 ? "not-allowed" : "pointer",
-          }}
         >
           😊
         </button>
-        <button
-          onClick={() => sendFeedback("sad")}
+        <button className="feedback-button"
+          onClick={() => sendFeedback("Sad")}
           disabled={timeLeft === 0}
-          style={{
-            fontSize: "2rem",
-            cursor: timeLeft === 0 ? "not-allowed" : "pointer",
-          }}
         >
           😞
         </button>
-        <button
-          onClick={() => sendFeedback("surprised")}
+        <button className="feedback-button"
+          onClick={() => sendFeedback("Surprised")}
           disabled={timeLeft === 0}
-          style={{
-            fontSize: "2rem",
-            cursor: timeLeft === 0 ? "not-allowed" : "pointer",
-          }}
         >
           😲
         </button>
-        <button
-          onClick={() => sendFeedback("confused")}
+        <button className="feedback-button"
+          onClick={() => sendFeedback("Confused")}
           disabled={timeLeft === 0}
-          style={{
-            fontSize: "2rem",
-            cursor: timeLeft === 0 ? "not-allowed" : "pointer",
-          }}
         >
           😕
         </button>
       </div>
-
-      <h3>Feedback primit:</h3>
+      <h3 className="activity-list-title">Activity Feedback</h3>
       <ul>
         {feedbacks.map((f, i) => (
-          <li key={i}>
-            {f.emoji} - {new Date(f.timestamp).toLocaleTimeString()}
+          <li className = "list-item"
+           key={i}>
+          {new Date(f.timestamp).toLocaleTimeString()} - {f.emoji} 
           </li>
         ))}
       </ul>
-
       {timeLeft === 0 && (
         <p style={{ fontWeight: "bold" }}>⏰ Activitatea s-a încheiat.</p>
       )}
 
-      <button
+      <button className="back-button"
         onClick={goBack}
-        style={{
-          marginTop: "1rem",
-          padding: "0.5rem 1rem",
-          backgroundColor: "#ccc",
-          border: "none",
-          borderRadius: "5px",
-          cursor: "pointer",
-        }}
       >
-        ⬅️ Înapoi la cod activitate
+        <span className="return-emoji">⬅</span>
+        <span className="return-text">Return to activity code</span>
       </button>
     </div>
+    </>
   );
 }
