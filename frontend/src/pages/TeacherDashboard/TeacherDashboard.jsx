@@ -13,11 +13,13 @@ export default function TeacherDashboard() {
   const [timeLeft, setTimeLeft] = useState(0);
 
   const token = localStorage.getItem("token");
+  const API_URL =
+    "https://feedback-app-123-d3b8dkfce8h2ctey.westeurope-01.azurewebsites.net/api/";
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await fetch("http://localhost:5000/api/activities", {
+      const res = await fetch(`${API_URL}/activities`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -44,7 +46,7 @@ export default function TeacherDashboard() {
 
   const fetchCurrentActivity = async () => {
     try {
-      const res = await fetch("http://localhost:5000/api/activities/current", {
+      const res = await fetch(`${API_URL}/activities/current`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (!res.ok) {
@@ -68,7 +70,7 @@ export default function TeacherDashboard() {
 
   const fetchPastActivities = async () => {
     try {
-      const res = await fetch("http://localhost:5000/api/activities/past", {
+      const res = await fetch(`${API_URL}/activities/past`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();

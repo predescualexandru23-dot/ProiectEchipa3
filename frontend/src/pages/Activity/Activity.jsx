@@ -9,6 +9,7 @@ export default function ActivityPage() {
   const [message, setMessage] = useState("");
   const [feedbacks, setFeedbacks] = useState([]);
   const [timeLeft, setTimeLeft] = useState(0); // în secunde
+  const API_URL = "https://feedback-app-123-d3b8dkfce8h2ctey.westeurope-01.azurewebsites.net/api/";
 
   // Polling feedback
   useEffect(() => {
@@ -18,7 +19,7 @@ export default function ActivityPage() {
       const fetchFeedback = async () => {
         try {
           const res = await axios.get(
-            `http://localhost:5000/api/activities/feedback/${activity.accessCode}`
+            `${API_URL}/activities/feedback/${activity.accessCode}`
           );
           setFeedbacks(res.data);
         } catch (err) {
@@ -47,12 +48,9 @@ export default function ActivityPage() {
   // Join activitate
   const joinActivity = async () => {
     try {
-      const res = await axios.post(
-        "http://localhost:5000/api/activities/join",
-        {
-          accessCode: accessCodeInput,
-        }
-      );
+      const res = await axios.post(`${API_URL}/activities/join`, {
+        accessCode: accessCodeInput,
+      });
 
       if (!res.data) {
         setMessage("Invalid code or inexistent activity");
@@ -79,13 +77,13 @@ export default function ActivityPage() {
     if (timeLeft <= 0) return;
 
     try {
-      await axios.post("http://localhost:5000/api/activities/feedback", {
+      await axios.post(`${API_URL}/activities/feedback`, {
         accessCode: activity.accessCode,
         emoji,
       });
       // fetch feedback imediat
       const res = await axios.get(
-        `http://localhost:5000/api/activities/feedback/${activity.accessCode}`
+        `${API_URL}/activities/feedback/${activity.accessCode}`
       );
       setFeedbacks(res.data);
     } catch (err) {
