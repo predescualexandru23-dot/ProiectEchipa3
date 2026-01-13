@@ -25,7 +25,7 @@ on:
   workflow_dispatch:
 
 env:
-  AZURE_WEBAPP_NAME: feedback-app-backend
+  AZURE_WEBAPP_NAME: feedback-app-123
   NODE_VERSION: '20.x'
 
 permissions:
