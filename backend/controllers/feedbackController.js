@@ -32,12 +32,16 @@ export const getFeedback = async (req, res) => {
     try {
         const { accessCode } = req.params;
 
-        // Caută cea mai recentă activitate activă
         const now = new Date();
+
         const activities = await Activity.findAll({
             where: { accessCode },
             order: [["date", "DESC"]],
-            include: [{ model: Feedback, as: "feedbacks" }],
+            include: [{
+                model: Feedback,
+                as: "feedbacks",
+                order: [["timestamp", "ASC"]] // 🔥 CHEIA PROBLEMEI
+            }],
         });
 
         const activity = activities.find((act) => {
@@ -45,14 +49,24 @@ export const getFeedback = async (req, res) => {
             return endTime > now;
         });
 
-        if (!activity) return res.status(404).json({ message: "Activitate inexistentă sau s-a încheiat" });
+        if (!activity) {
+            return res.status(404).json({
+                message: "Activitate inexistentă sau s-a încheiat"
+            });
+        }
 
-        res.json(activity.feedbacks);
+        // siguranță extra: sortare finală
+        const sortedFeedbacks = activity.feedbacks.sort(
+            (a, b) => new Date(a.timestamp) - new Date(b.timestamp)
+        );
+
+        res.json(sortedFeedbacks);
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: "Eroare la obținerea feedback-ului" });
     }
 };
+
 
 
 // Obține activitatea completă + feedback pentru frontend

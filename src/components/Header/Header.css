@@ -1,14 +1,10 @@
 .header {
-  background: linear-gradient(135deg, var(--color-primary), #3a3f7a);
-  color: white;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 16px 32px;
-  font-weight: 500;
-  font-size: 1.1rem;
-  border-bottom: 2px solid rgba(255, 255, 255, 0.2);
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  padding: 3vh 6vh;
+  border-bottom: 2px solid var(--light-indigo);
+  box-shadow: 0 10px 50px -10px var(--light-indigo);
 }
 
 .welcome {
@@ -17,7 +13,6 @@
   font-weight: 600;
   animation: fadeSlide 0.5s ease forwards;
 }
-
 
 .logout-btn {
   background-color: var(--red);
@@ -28,14 +23,12 @@
   cursor: pointer;
   font-weight: 600;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 10px rgba(3,130,199,0.3);
 }
 
 .logout-btn:hover {
-  background-color: #e5e7eb;
-  transform: translateY(-2px);
+  background-color: var(--white);
+  color: var(--red);
 }
-
 
 @keyframes fadeSlide {
   0% {

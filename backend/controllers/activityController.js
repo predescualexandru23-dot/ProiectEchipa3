@@ -1,48 +1,74 @@
 import { Activity } from "../models/Activity.js";
 
 // 🔹 Creează activitate (profesor)
+
 export const createActivity = async (req, res) => {
     try {
         const { description, duration, accessCode } = req.body;
+        const userId = req.user.id; // profesorul logat
 
         if (!description || !duration || !accessCode) {
-            return res.status(400).json({ message: "Toate câmpurile sunt obligatorii" });
+            return res.status(400).json({
+                message: "Please fill in all the text fields",
+            });
+        }
+
+        // 🔴 VERIFICARE DESCRIERE DUPLICATĂ (per profesor)
+        const existingWithSameDescription = await Activity.findOne({
+            where: {
+                description,
+                UserId: userId,
+            },
+        });
+
+        if (existingWithSameDescription) {
+            return res.status(400).json({
+                message:
+                    "There already is an activity with this title, please use a different one!",
+            });
         }
 
         const now = new Date();
 
-        // Caută activități cu același cod pentru profesorul curent
+        // 🔵 Verificare cod activ (ce aveai deja)
         const existingActivities = await Activity.findAll({
-            where: { accessCode, UserId: req.user.id },
+            where: { accessCode, UserId: userId },
             order: [["date", "DESC"]],
         });
 
-        // Verifică dacă vreuna este încă activă
         const activeActivity = existingActivities.find((act) => {
-            const endTime = new Date(act.date.getTime() + act.duration * 60000);
-            return endTime > now; // încă activă
+            const endTime = new Date(
+                new Date(act.date).getTime() + act.duration * 60000
+            );
+            return endTime > now;
         });
 
         if (activeActivity) {
             return res.status(400).json({
-                message: "Codul de acces este folosit de o activitate încă activă",
+                message: "This access code is used by another activity that is currently running",
             });
         }
 
-        // Creează activitatea
+        // ✅ Creează activitatea
         const activity = await Activity.create({
             description,
             duration,
             accessCode,
-            UserId: req.user.id, // asociem activitatea cu profesorul logat
+            UserId: userId,
         });
 
-        res.status(201).json({ message: "Activitate creată cu succes", activity });
+        res.status(201).json({
+            message: "Activity created succesfully!",
+            activity,
+        });
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: "Eroare la crearea activității" });
+        res.status(500).json({
+            message: "Error creating activity",
+        });
     }
 };
+
 
 // 🔹 Obține activitatea curentă (profesor)
 export const getActiveActivityWithFeedback = async (req, res) => {
@@ -55,15 +81,15 @@ export const getActiveActivityWithFeedback = async (req, res) => {
             include: ["feedbacks"],
         });
 
-        if (!activity) return res.status(404).json({ message: "Nicio activitate" });
+        if (!activity) return res.status(404).json({ message: "No activity" });
 
         const endTime = new Date(activity.date.getTime() + activity.duration * 60000);
-        if (endTime < now) return res.status(404).json({ message: "Nicio activitate activă" });
+        if (endTime < now) return res.status(404).json({ message: "No active activity" });
 
         res.json(activity);
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: "Eroare la obținerea activității curente" });
+        res.status(500).json({ message: "Error fetching current activity" });
     }
 };
 
@@ -86,7 +112,7 @@ export const getPastActivities = async (req, res) => {
         res.json(pastActivities);
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: "Eroare la obținerea activităților trecute" });
+        res.status(500).json({ message: "Error fetching past activities" });
     }
 };
 
@@ -96,7 +122,7 @@ export const joinActivity = async (req, res) => {
         const { accessCode } = req.body;
 
         if (!accessCode) {
-            return res.status(400).json({ message: "Trebuie să introduci un cod de activitate" });
+            return res.status(400).json({ message: "You must enter an activity code" });
         }
 
         const now = new Date();
@@ -114,12 +140,12 @@ export const joinActivity = async (req, res) => {
         });
 
         if (!activity) {
-            return res.status(404).json({ message: "Codul activității nu este valid sau activitatea s-a încheiat" });
+            return res.status(404).json({ message: "Activity code invalid or activity already finished" });
         }
 
         res.json(activity); // trimite activitatea activă către frontend
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: "Eroare la accesarea activității" });
+        res.status(500).json({ message: "Error accessing activity" });
     }
 };

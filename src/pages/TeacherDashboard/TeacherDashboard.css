@@ -165,3 +165,14 @@
   padding: 0.1rem 0.5rem 0.1rem 0.2rem;
   border-radius: 1.5rem;
 }
+
+@media (max-width: 768px) {
+  .professor-dashboard-wrapper {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .section {
+    width: 90vw;
+  }
+}

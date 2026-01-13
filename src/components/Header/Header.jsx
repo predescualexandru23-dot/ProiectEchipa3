@@ -12,15 +12,14 @@ export default function Header() {
     navigate("/login");
   };
 
-   return (
+  return (
     <header className="header">
       <div className="welcome">
-        Bun venit{role === "profesor" ? ", Prof." : ""} {name || "utilizator"}!
+        Welcome, {role === "profesor" ? "Prof." : ""} {name || "utilizator"}!
       </div>
       <button onClick={handleLogout} className="logout-btn">
-      🔒 Logout
+        Log Out
       </button>
     </header>
   );
 }
-
