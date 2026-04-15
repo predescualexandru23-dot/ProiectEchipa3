@@ -1,4 +1,6 @@
 
+![App Screenshot](https://i.imgur.com/YhBUyYM.png)
+
 
     Aplicație web acordarea de feedback continuu
 
